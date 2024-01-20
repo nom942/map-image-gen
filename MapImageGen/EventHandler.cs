@@ -104,7 +104,7 @@ namespace MapImageGen
                 };
 
                 // send the combined JSON structure to the web server 
-                Task.Run(() => SendBotRequest("http://localhost:8080/positions", JsonConvert.SerializeObject(combinedJsonData)));
+                Task.Run(() => SendBotRequest($"http://{Plugin.Instance.Config.WebServerIP}/positions", JsonConvert.SerializeObject(combinedJsonData)));
 
                 // wait for 5 seconds before the next iteration
                 yield return Timing.WaitForSeconds(5f);

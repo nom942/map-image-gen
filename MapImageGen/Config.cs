@@ -16,5 +16,8 @@ namespace MapImageGen
         [Description("Scale factor for image generation.")]
         public int ScaleFactor { get; set; } = 25;
 
+        [Description("Web server IP.")]
+        public string WebServerIP { get; set; } = "";
+
     }
 }
