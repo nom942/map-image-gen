@@ -15,5 +15,8 @@ namespace MapImageGen
         [Description("Enable debugging logs.")]
         public bool Debug { get; set; } = false;
 
+        [Description("Scale factor for image generation.")]
+        public int ScaleFactor { get; set; } = 20;
+
     }
 }

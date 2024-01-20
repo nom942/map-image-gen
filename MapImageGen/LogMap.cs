@@ -1,6 +1,7 @@
 using Exiled.API.Features.Pools;
 using HarmonyLib;
 using MapGeneration;
+using MapImageGen;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,8 +17,8 @@ public static class LogMap
     public static void MapCreated(Texture2D map)
     {
         // added this resizer so you can just alter the desired width and height for the image
-        int newWidth = map.width * 25;  
-        int newHeight = map.height * 25; 
+        int newWidth = map.width * Plugin.Instance.Config.ScaleFactor;  
+        int newHeight = map.height * Plugin.Instance.Config.ScaleFactor; 
 
         Texture2D resizedMap = new Texture2D(newWidth, newHeight);
 
