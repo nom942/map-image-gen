@@ -1,6 +1,5 @@
 using System;
 using Exiled.API.Features;
-using Player = Exiled.Events.Handlers.Player;
 using HarmonyLib;
 
 namespace MapImageGen
