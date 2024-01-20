@@ -17,7 +17,7 @@ public static class LogMap
 
     public static void MapCreated(Texture2D map)
     {
-        // Assign a letter (A, B, C, etc.) to each generated image
+        // assign a letter (A, B, C) to each generated image (LZ, HCZ then EZ in that order)
         char imageLetter = (char)('A' + imageCount);
         imageCount++;
 
