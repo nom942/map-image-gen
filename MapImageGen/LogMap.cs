@@ -1,6 +1,7 @@
 using Exiled.API.Features.Pools;
 using HarmonyLib;
 using MapGeneration;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection.Emit;
@@ -8,12 +9,15 @@ using UnityEngine;
 
 [HarmonyPatch(typeof(ImageGenerator), nameof(ImageGenerator.GenerateMap))]
 public static class LogMap
+
 {
+    private static string folderPath;
+
     public static void MapCreated(Texture2D map)
     {
         // added this resizer so you can just alter the desired width and height for the image
-        int newWidth = map.width * 8;  
-        int newHeight = map.height * 8; 
+        int newWidth = map.width * 25;  
+        int newHeight = map.height * 25; 
 
         Texture2D resizedMap = new Texture2D(newWidth, newHeight);
 
@@ -41,15 +45,29 @@ public static class LogMap
         // apply changes to the resized map
         resizedMap.Apply();
 
+        // create the folder only if it hasn't been created yet
+        if (folderPath == null)
+        {
+            // create a folder with a unique timestamp for the set of images (this kind of just looks like shit but it helps with identifying)
+            string folderName = $"Maps_{DateTime.Now:yyyyMMdd_HHmmss}";
+            folderPath = Path.Combine("D:", folderName);
+
+            // make sure the folder exists
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+        }
+
         // encode the resized map to PNG
         byte[] bytearray = ImageConversion.EncodeToPNG(resizedMap);
 
-        // specify the path for saving the image
-        string path = Path.Combine("D:", $"Map{UnityEngine.Random.Range(0, 99999)}.png");
+        // specify the path for saving the image into the folder
+        string imagePath = Path.Combine(folderPath, $"Map{UnityEngine.Random.Range(0, 99999)}.png");
 
         // log the path and save the image
-        Exiled.API.Features.Log.Info(path);
-        File.WriteAllBytes(path, bytearray);
+        Exiled.API.Features.Log.Info(imagePath);
+        File.WriteAllBytes(imagePath, bytearray);
     }
 
     public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
