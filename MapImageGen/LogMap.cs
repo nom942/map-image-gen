@@ -13,12 +13,17 @@ public static class LogMap
 
 {
     private static string folderPath;
+    private static int imageCount = 0;
 
     public static void MapCreated(Texture2D map)
     {
+        // Assign a letter (A, B, C, etc.) to each generated image
+        char imageLetter = (char)('A' + imageCount);
+        imageCount++;
+
         // added this resizer so you can just alter the desired width and height for the image
-        int newWidth = map.width * Plugin.Instance.Config.ScaleFactor;  
-        int newHeight = map.height * Plugin.Instance.Config.ScaleFactor; 
+        int newWidth = map.width * Plugin.Instance.Config.ScaleFactor;
+        int newHeight = map.height * Plugin.Instance.Config.ScaleFactor;
 
         Texture2D resizedMap = new Texture2D(newWidth, newHeight);
 
@@ -64,10 +69,10 @@ public static class LogMap
         byte[] bytearray = ImageConversion.EncodeToPNG(resizedMap);
 
         // specify the path for saving the image into the folder
-        string imagePath = Path.Combine(folderPath, $"Map{UnityEngine.Random.Range(0, 99999)}.png");
+        string imagePath = Path.Combine(folderPath, $"{imageLetter}.png");
 
         // log the path and save the image
-        Exiled.API.Features.Log.Info(imagePath);
+        Exiled.API.Features.Log.Info($"Saving image {imageLetter} at {imagePath}");
         File.WriteAllBytes(imagePath, bytearray);
     }
 
@@ -78,14 +83,23 @@ public static class LogMap
 
         newInstructions.InsertRange(index, new[]
         {
-            new CodeInstruction(OpCodes.Ldarg_0),
-            new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(ImageGenerator), nameof(ImageGenerator.map))),
-            new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(LogMap), nameof(MapCreated)))
-        });
+        new CodeInstruction(OpCodes.Ldarg_0),
+        new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(ImageGenerator), nameof(ImageGenerator.map))),
+        new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(LogMap), nameof(MapCreated)))
+    });
+
+        // add debugging for each map generation because why not
+        newInstructions.Insert(0, new CodeInstruction(OpCodes.Ldstr, "Transpiler: Generating map"));
+        newInstructions.Insert(1, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(LogMap), nameof(LogDebug))));
 
         foreach (var instruction in newInstructions)
         {
             yield return instruction;
         }
+    }
+
+    public static void LogDebug(string message)
+    {
+        Exiled.API.Features.Log.Debug(message);
     }
 }
