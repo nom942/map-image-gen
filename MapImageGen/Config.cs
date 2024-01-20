@@ -16,7 +16,7 @@ namespace MapImageGen
         public bool Debug { get; set; } = false;
 
         [Description("Scale factor for image generation.")]
-        public int ScaleFactor { get; set; } = 20;
+        public int ScaleFactor { get; set; } = 25;
 
     }
 }
