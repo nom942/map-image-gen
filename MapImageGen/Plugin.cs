@@ -1,6 +1,7 @@
 using System;
 using Exiled.API.Features;
 using HarmonyLib;
+using Server = Exiled.Events.Handlers.Server;
 
 namespace MapImageGen
 {
@@ -20,6 +21,9 @@ namespace MapImageGen
         {
             EventHandler = new EventHandler();
 
+            Server.RoundStarted += EventHandler.OnRoundStarted;
+            Server.RoundEnded += EventHandler.OnRoundEnded;
+
             Instance = this;
 
             try
@@ -37,7 +41,10 @@ namespace MapImageGen
 
         public override void OnDisabled()
         {
-      
+
+            Server.RoundStarted -= EventHandler.OnRoundStarted;
+            Server.RoundEnded -= EventHandler.OnRoundEnded;
+
             EventHandler = null;
             Instance = null;
             base.OnDisabled();
