@@ -47,11 +47,13 @@ namespace MapImageGen
         public void OnRoundStarted()
         {
             coroutineHandle = Timing.RunCoroutine(TrackLivePlayerPositionsCoroutine());
+            Log.Debug("coroutine started");
         }
 
         public void OnRoundEnded(RoundEndedEventArgs ev)
         {
             Timing.KillCoroutines(coroutineHandle);
+            Log.Debug("coroutine killed");
         }
 
         private IEnumerator<float> TrackLivePlayerPositionsCoroutine()
@@ -63,13 +65,17 @@ namespace MapImageGen
                 hczPlayers.Clear();
                 ezPlayers.Clear();
                 surfacePlayers.Clear();
+                Log.Debug("cleared all lists");
 
                 foreach (Player player in Player.List)
                 {
                     // determine the zone of the player and assign them a list
 
                     if (player.Zone == ZoneType.LightContainment)
+                    {
                         lczPlayers.Add(player);
+                        Log.Debug("player added to lcz");
+                    }          
                     else if (player.Zone == ZoneType.HeavyContainment)
                         hczPlayers.Add(player);
                     else if (player.Zone == ZoneType.Entrance)
@@ -80,11 +86,15 @@ namespace MapImageGen
                         continue;
                 }
 
+                // FROM THIS POINT IT FAILS 
+
+
                 // create JSON packages for each zone
                 string lczJson = JsonConvert.SerializeObject(GetPlayerData(lczPlayers));
                 string hczJson = JsonConvert.SerializeObject(GetPlayerData(hczPlayers));
                 string ezJson = JsonConvert.SerializeObject(GetPlayerData(ezPlayers));
                 string surfaceJson = JsonConvert.SerializeObject(GetPlayerData(surfacePlayers));
+                Log.Debug("created json packages");
 
                 // combine all JSON data into one structure
                 var combinedJsonData = new
@@ -94,9 +104,12 @@ namespace MapImageGen
                     ez = JsonConvert.DeserializeObject<List<PlayerData>>(ezJson),
                     surface = JsonConvert.DeserializeObject<List<PlayerData>>(surfaceJson)
                 };
+                Log.Debug(combinedJsonData);
 
                 // send the combined JSON structure to the web server 
                 Task.Run(() => SendBotRequest($"http://{Plugin.Instance.Config.WebServerIP}/positions", JsonConvert.SerializeObject(combinedJsonData)));
+                Log.Debug("task ran");
+                Log.Debug($"{lczPlayers}");
 
                 // wait for 5 seconds before the next iteration
                 yield return Timing.WaitForSeconds(5f);
@@ -137,7 +150,7 @@ namespace MapImageGen
 
                     if (response.IsSuccessStatusCode && Plugin.Instance.Config.Debug)
                     {
-                        Log.Info("Details sent to bot.");
+                        Log.Info("Player pos data sent to bot.");
                     }
                     else if (Plugin.Instance.Config.Debug)
                     {
