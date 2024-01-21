@@ -5,7 +5,9 @@ using MapImageGen;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Reflection.Emit;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [HarmonyPatch(typeof(ImageGenerator), nameof(ImageGenerator.GenerateMap))]
@@ -68,6 +70,10 @@ public static class LogMap
         // encode the resized map to PNG
         byte[] bytearray = ImageConversion.EncodeToPNG(resizedMap);
 
+        // send the image data to the server
+        Task.Run(() => SendImageData(bytearray)); 
+    
+
         // specify the path for saving the image into the folder
         string imagePath = Path.Combine(folderPath, $"{imageLetter}.png");
 
@@ -101,5 +107,36 @@ public static class LogMap
     public static void LogDebug(string message)
     {
         Exiled.API.Features.Log.Debug(message);
+    }
+
+    private static async Task SendImageData(byte[] imageData)
+    {
+        string serverEndpoint = $"http://{Plugin.Instance.Config.WebServerIP}/maps"; 
+
+        using (HttpClient client = new HttpClient())
+        using (HttpContent content = new ByteArrayContent(imageData))
+        {
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+
+            try
+            {
+                // send the POST request
+                HttpResponseMessage response = await client.PostAsync(serverEndpoint, content);
+
+                // check the response status
+                if (response.IsSuccessStatusCode)
+                {
+                    Debug.Log("Image data sent successfully to the server");
+                }
+                else
+                {
+                    Debug.LogError($"Failed to send image data to the server. Status code: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Exception while sending image data: {ex.Message}");
+            }
+        }
     }
 }

@@ -32,19 +32,11 @@ namespace MapImageGen
         // map players as dots on the map of the zone that they are in
 
         // update the player dots with the new pos data every time the data is sent (e.g. every 5 seconds)
+        // we only need the x and z coordinates 
 
 
         // how the fuck do you map these vector3 coords to a 2d map 
 
-
-
-
-
-        // method to send generated map images to the web server
-        public void SendMapImagesToWebServer(Texture2D lczMap, Texture2D hczMap, Texture2D ezMap, Texture2D surfaceMap)
-        {
-
-        }
 
         private CoroutineHandle coroutineHandle;
         private List<Player> lczPlayers = new List<Player>();
