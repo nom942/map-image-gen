@@ -7,7 +7,6 @@ namespace MapImageGen
 {
     public class Plugin : Plugin<Config>
     {
-        private EventHandler EventHandler;
 
         public override string Name => "MapImageGen";
         public override string Author => "Nom";
@@ -19,8 +18,6 @@ namespace MapImageGen
 
         public override void OnEnabled()
         {
-            EventHandler = new EventHandler();
-
             Server.RoundStarted += EventHandler.OnRoundStarted;
             Server.RoundEnded += EventHandler.OnRoundEnded;
 
@@ -45,7 +42,6 @@ namespace MapImageGen
             Server.RoundStarted -= EventHandler.OnRoundStarted;
             Server.RoundEnded -= EventHandler.OnRoundEnded;
 
-            EventHandler = null;
             Instance = null;
             base.OnDisabled();
         }

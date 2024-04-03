@@ -70,16 +70,17 @@ public static class LogMap
         // encode the resized map to PNG
         byte[] bytearray = ImageConversion.EncodeToPNG(resizedMap);
 
-        // send the image data to the server
-        Task.Run(() => SendImageData(bytearray)); 
-    
-
         // specify the path for saving the image into the folder
         string imagePath = Path.Combine(folderPath, $"{imageLetter}.png");
 
         // log the path and save the image
         Exiled.API.Features.Log.Info($"Saving image {imageLetter} at {imagePath}");
         File.WriteAllBytes(imagePath, bytearray);
+
+        // send the image data to the server
+
+        if (!string.IsNullOrEmpty(Plugin.Instance.Config.WebServerIP))
+            Task.Run(() => SendImageData(bytearray));
     }
 
     public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
@@ -111,6 +112,7 @@ public static class LogMap
 
     private static async Task SendImageData(byte[] imageData)
     {
+        // i was using an express server running on a discord bot
         string serverEndpoint = $"http://{Plugin.Instance.Config.WebServerIP}/maps"; 
 
         using (HttpClient client = new HttpClient())
